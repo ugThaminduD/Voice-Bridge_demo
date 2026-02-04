@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.VoiceBridge"
+        tools:targetApi="31">
+        <activity
+            android:name=".SentencesProgressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WordProgressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LetterProgressActivity"
+            android:exported="false" />
+         <activity
+            android:name=".PainSymbolsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActivitySymbolsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EmotionSymbolsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SanitationSymbolsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ColoursSymbolsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FoodSymbolsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ClothesSymbolActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ToysSymbolActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DrinkSymbolActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SanackSymbolActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SpeechLevel3TaskActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SpeechLevel3Activity"
+            android:exported="false" />
+        <activity
+            android:name=".SpeechProgressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TeacherDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Education_therapyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Education_subjects_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".Edu_LessonDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Edu_LessonListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Edu_SubLessonDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RhythmSummaryActivity"
+            android:exported="false" />
+        
+        <activity
+            android:name=".RMScoreboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RMGuidanceActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RMIntroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ASequenceScoreboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UnlockStickerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ASGuidanceAboveActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ASGuide_BelowActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MMScoreboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AllCorrectGrandPrizeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MusicPlayerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SongSelectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActivitySequenceOverActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActivitySequenceUnderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RoutineSelectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MoodMatchSevenUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MoodMatchSevenDownActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PandaIntroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GameDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SymbolCard1Activity"
+            android:exported="false" />
+        <activity
+            android:name=".PhraseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".QuickWordsChartsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SymbolChartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".QuickWordsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SymbolCommunicationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SpeechLevel2TaskActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SpeechLevel1TaskActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SpeechLevel2Activity"
+            android:exported="false" />
+        <activity
+            android:name=".SpeechLevel1Activity"
+            android:exported="false" />
+        <activity
+            android:name=".SpeechPracticeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TeacherRegistrationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChildRegistrationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateAccountActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
