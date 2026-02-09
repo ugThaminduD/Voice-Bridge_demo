@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -26,40 +27,76 @@ class Education_therapyActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_education_therapy)
 
-        // Initialize AI Model
+        // Initialize AI Model (TFLite task recommender)
         try {
             recommender = Edu_TaskRecommender(this)
+            Toast.makeText(this, "✅ AI Model loaded successfully", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Toast.makeText(this, "AI Model initialization failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            e.printStackTrace()
+            Toast.makeText(this, "⚠️ AI Model error: ${e.message}", Toast.LENGTH_LONG).show()
         }
 
-        val btnrecommend: Button = findViewById(R.id.btn_recommend)
-        val btnLevel1: Button = findViewById(R.id.btn_age1)
-        val btnLevel2: Button = findViewById(R.id.btn_age2)
-        val btnLevel3: Button = findViewById(R.id.btn_age3)
-        val btnLevel4: Button = findViewById(R.id.btn_age4)
-        val btnLevel5: Button = findViewById(R.id.btn_age5)
+        // Card references
+        val cardRecommend: CardView = findViewById(R.id.card_recommend)
+        val cardAge1: CardView = findViewById(R.id.card_age1)
+        val cardAge2: CardView = findViewById(R.id.card_age2)
+        val cardAge3: CardView = findViewById(R.id.card_age3)
+        val cardAge4: CardView = findViewById(R.id.card_age4)
+        val cardAge5: CardView = findViewById(R.id.card_age5)
+        val cardProgress: CardView = findViewById(R.id.card_progress)
+        val cardChatbot: CardView = findViewById(R.id.card_chatbot)
+        
+        val btnRecommend: Button = findViewById(R.id.btn_recommend)
+        val btnChatbot: Button = findViewById(R.id.btn_chatbot)
+        val checkProgress: Button = findViewById(R.id.check_progress)
         val backButton: ImageView = findViewById(R.id.back)
 
 
-        btnLevel1.setOnClickListener {
+        // Age card clicks
+        cardAge1.setOnClickListener {
             navigateToSubjectsActivity("6")
         }
-        btnLevel2.setOnClickListener {
+        cardAge2.setOnClickListener {
             navigateToSubjectsActivity("7")
         }
-        btnLevel3.setOnClickListener {
+        cardAge3.setOnClickListener {
             navigateToSubjectsActivity("8")
         }
-        btnLevel4.setOnClickListener {
+        cardAge4.setOnClickListener {
             navigateToSubjectsActivity("9")
         }
-        btnLevel5.setOnClickListener {
+        cardAge5.setOnClickListener {
             navigateToSubjectsActivity("10")
         }
-        btnrecommend.setOnClickListener {
+        
+        // Recommendation card and button clicks
+        cardRecommend.setOnClickListener {
             fetchUserAgeAndNavigate()
-//            navigateToSubjectsActivity("__") // this age is get from firestore base on loing user bcz for this point age is not selected
+        }
+        
+        btnRecommend.setOnClickListener {
+            fetchUserAgeAndNavigate()
+        }
+        
+        // Progress card click
+        cardProgress.setOnClickListener {
+            // Navigate to progress screen
+            Toast.makeText(this, "📊 Opening Progress Dashboard...", Toast.LENGTH_SHORT).show()
+        }
+        
+        // Chatbot card click
+        cardChatbot.setOnClickListener {
+            val intent = Intent(this, ChatbotActivity::class.java)
+            startActivity(intent)
+        }
+
+        btnChatbot.setOnClickListener {
+            val intent = Intent(this, ChatbotActivity::class.java)
+            startActivity(intent)
+        }
+        
+        checkProgress.setOnClickListener {
+            Toast.makeText(this, "📊 Opening Progress Dashboard...", Toast.LENGTH_SHORT).show()
         }
 
         backButton.setOnClickListener {
@@ -163,7 +200,7 @@ class Education_therapyActivity : AppCompatActivity() {
         }
 
         // Show loading message
-        Toast.makeText(this, "Loading recommended lessons...", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "🤖 Getting AI recommendations...", Toast.LENGTH_SHORT).show()
 
         db.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
@@ -172,8 +209,8 @@ class Education_therapyActivity : AppCompatActivity() {
                     val userAge = document.getString("age")
 
                     if (userAge != null && userAge.isNotEmpty()) {
-                        // Navigate with the fetched age
-                        navigateToRecommendListActivity(userAge)
+                        // Navigate to Flask API recommendations
+                        navigateToAIRecommendations(userAge)
                     } else {
                         Toast.makeText(
                             this,
@@ -196,6 +233,31 @@ class Education_therapyActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
             }
+    }
+
+    /**
+     * Navigate to AI recommendations using Flask API
+     * This displays beautiful card UI with all AI-generated therapy tasks
+     */
+    private fun navigateToAIRecommendations(ageString: String) {
+        if (disorderType == null) {
+            Toast.makeText(this, "Disorder type not set!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            val ageInt = ageString.toIntOrNull() ?: 6
+            
+            // Navigate to AITherapyTasksActivity
+            val intent = Intent(this, AITherapyTasksActivity::class.java)
+            intent.putExtra("AGE", ageInt)
+            intent.putExtra("DISORDER", disorderType)
+            startActivity(intent)
+
+        } catch (e: Exception) {
+            Toast.makeText(this, "Navigation Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            e.printStackTrace()
+        }
     }
 
 
@@ -228,11 +290,12 @@ class Education_therapyActivity : AppCompatActivity() {
         val disorderIndex = encodeDisorder(disorderType!!)
         val severityIndex = encodeSeverity(disorderSeverity!!)
 
-        // Step 2: Get AI prediction
+        // Step 2: Get AI prediction (4 features: age, disorder, severity, subject)
         val (predictedIndex, confidence) = recommender.predict(
             age = ageInt,
             disorderType = disorderIndex,
-            subject = severityIndex
+            severity = severityIndex,
+            subject = 0  // Default to Math (0), can be made dynamic later
         )
 
         // Step 3: Decode prediction to subject name
@@ -296,23 +359,23 @@ class Education_therapyActivity : AppCompatActivity() {
     }
 
 
-//     * Decode ML model output to subject name. The mapping depends on your training data
+//     * Decode ML model output to subject name. 
+    // IMPORTANT: These must match EXACTLY with the "subject" field in lessons04.json
     private fun decodeSubject(predictedIndex: Int): String {
-        // Map based on the most common subjects in your dataset
+        // Map based on actual subjects in lessons04.json
         val subjects = listOf(
-            "Basic Math",      // 0
-            "Reading",         // 1
-            "Speech",          // 2
-            "English",         // 3
-            "Science",         // 4
-            "Math",            // 5
-            "General",         // 6
-            "Math Advanced",   // 7
-            "Speech Games"     // 8
+            "General",         // 0 - General activities
+            "Basic Math",      // 1 - Basic math concepts
+            "Speech",          // 2 - Speech therapy
+            "Reading",         // 3 - Reading activities
+            "General",         // 4 - Fallback to General
+            "Basic Math",      // 5 - More math
+            "Speech",          // 6 - More speech
+            "Reading"          // 7 - More reading
         )
 
-        // Use modulo to handle indices beyond the list size
-        return subjects.getOrNull(predictedIndex % subjects.size) ?: "General"
+        // Safely get subject with fallback to General
+        return subjects.getOrElse(predictedIndex) { "General" }
     }
 
 

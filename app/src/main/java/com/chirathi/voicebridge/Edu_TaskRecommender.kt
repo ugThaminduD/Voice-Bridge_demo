@@ -140,7 +140,7 @@ import java.nio.channels.FileChannel
 class Edu_TaskRecommender(context: Context) {
 
     private val interpreter: Interpreter
-    private val inputFeatureCount = 3  // age, disorderType, severity
+    private val inputFeatureCount = 4  // age, disorderType, severity, subject
     private val outputClassCount = 36  // Based on your trained model
 
     init {
@@ -161,19 +161,21 @@ class Edu_TaskRecommender(context: Context) {
      * Predict the best lesson recommendation
      * @param age Child's age (6-10)
      * @param disorderType Encoded disorder type (0-4)
-     * @param subject Encoded severity (0-2)
+     * @param severity Encoded severity (0-2)
+     * @param subject Encoded subject (0-2, defaults to 0 for Math)
      * @return Pair of (predicted class index, confidence score 0.0-1.0)
      */
-    fun predict(age: Int, disorderType: Int, subject: Int): Pair<Int, Float> {
+    fun predict(age: Int, disorderType: Int, severity: Int, subject: Int = 0): Pair<Int, Float> {
         // Normalize age to 0-1 range
         val normalizedAge = (age - 6).toFloat() / 4.0f
 
-        // Prepare input buffer (3 features)
+        // Prepare input buffer (4 features to match model's expected 16 bytes)
         val inputBuffer = ByteBuffer.allocateDirect(4 * inputFeatureCount)
             .order(ByteOrder.nativeOrder())
 
         inputBuffer.putFloat(normalizedAge)
         inputBuffer.putFloat(disorderType.toFloat())
+        inputBuffer.putFloat(severity.toFloat())
         inputBuffer.putFloat(subject.toFloat())
 
         // Allocate output buffer

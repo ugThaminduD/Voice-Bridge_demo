@@ -124,7 +124,8 @@ data class MatchPairModel(
 data class LessonModel(
     @DocumentId
     var id: String = "",
-    val ageGroup: String = "",
+    val age: String = "",              // From lessons04.json
+    val ageGroup: String = "",          // Legacy field for compatibility
     val subject: String = "",
     val disorderType: String = "",
     val lessonTitle: String = "",
@@ -133,6 +134,7 @@ data class LessonModel(
     val question: String = "",
     val correctAnswer: String = "",
     val iconName: String = "",
+    val lessonId: Int = 0,              // From lessons04.json
     val subLessons: List<SubLessonModel> = emptyList(),
     val answerType: AnswerType = AnswerType.TEXT,
     val options: List<OptionModel> = emptyList(),          // MCQ

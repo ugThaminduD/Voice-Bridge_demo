@@ -31,15 +31,19 @@ data class RecommendByTextRequest(
 )
 
 data class TherapyTask(
-    val title: String,
-    val description: String,
+    val activity: String,  // Main activity description from Flask
     @SerializedName("age_group")
     val ageGroup: String,
+    @SerializedName("disorder_category")
     val disorder: String,
-    val activity: String,
-    val materials: String,
-    val duration: String,
-    val tips: String,
+    val goal: String,  // Smart goal from Flask
+    val score: Double? = null,  // Similarity score
+    // Optional fields for backward compatibility
+    val title: String? = null,
+    val description: String? = null,
+    val materials: String? = null,
+    val duration: String? = null,
+    val tips: String? = null,
     val similarity: Double? = null
 )
 

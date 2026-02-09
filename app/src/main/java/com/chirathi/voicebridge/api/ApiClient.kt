@@ -14,15 +14,15 @@ object ApiClient {
     
     /**
      * Base URL Configuration:
-     * - For Android Emulator: http://10.0.2.2:5001
-     * - For Physical Device: http://<YOUR_MAC_IP>:5001 (e.g., http://192.168.1.137:5001)
+     * - For Android Emulator: http://10.0.2.2:5002
+     * - For Physical Device: http://<YOUR_MAC_IP>:5002 (e.g., http://192.168.1.137:5002)
      * 
      * To find your Mac IP: Open Terminal and run: ipconfig getifaddr en0
      */
-    private const val BASE_URL = "http://10.0.2.2:5001/"
+    private const val BASE_URL = "http://10.0.2.2:5002/"
     
     // For physical device testing, uncomment and update with your Mac's IP:
-    // private const val BASE_URL = "http://192.168.1.137:5001/"
+    // private const val BASE_URL = "http://192.168.1.137:5002/"
     
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

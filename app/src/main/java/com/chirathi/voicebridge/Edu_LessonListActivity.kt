@@ -69,6 +69,7 @@ package com.chirathi.voicebridge
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import android.view.View
 import android.widget.ProgressBar
@@ -81,15 +82,20 @@ import com.chirathi.voicebridge.data.LessonModel
 
 class Edu_LessonListActivity : AppCompatActivity() {
 
+    companion object {
+        private const val TAG = "Edu_LessonList"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edu_lesson_list)
 
         val age = intent.getStringExtra("AGE_GROUP") ?: "6"
         val subject = intent.getStringExtra("SUBJECT") ?: "General"
-        val disorderType  = intent.getStringExtra("DISORDER_TYPE") // Add disorder type
+        val disorderType  = intent.getStringExtra("DISORDER_TYPE")
         val disorderSeverity = intent.getStringExtra("DISORDER_SEVERITY")
 
+        Log.d(TAG, "Loading lessons: age='$age', subject='$subject', disorder='$disorderType'")
 
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
         val recyclerView = findViewById<RecyclerView>(R.id.rvLessons)
@@ -103,44 +109,8 @@ class Edu_LessonListActivity : AppCompatActivity() {
         progressBar.visibility = View.VISIBLE
         recyclerView.visibility = View.GONE
 
-//        LessonRepository.getLessons(
-//            age = age,
-//            subject = subject,
-//            disorderType = disorderType,
-//            onResult = { lessonList ->
-//                progressBar.visibility = View.GONE
-//                recyclerView.visibility = View.VISIBLE
-//
-//                if (lessonList.isEmpty()) {
-//                    Toast.makeText(this, "No lessons found for this subject", Toast.LENGTH_SHORT).show()
-//                }
-//
-//                val adapter = LessonAdapter(lessonList) { selectedLesson ->
-//                    // Check if sub-lessons exist, navigate accordingly
-//                    val intent = if (selectedLesson.subLessons.isNotEmpty()) {
-//                        Intent(this, Edu_SubLessonDetailActivity::class.java)
-//                    } else {
-//                        Intent(this, Edu_LessonDetailActivity::class.java)
-//                    }
-//
-//                    // Pass the complete lesson object to the next activity
-//                    intent.putExtra("lesson", selectedLesson)
-//                    intent.putExtra("AGE_GROUP", age)
-//                    intent.putExtra("DISORDER_TYPE", disorderType)
-//                    intent.putExtra("DISORDER_SEVERITY", disorderSeverity)
-//
-//                    startActivity(intent)
-//                }
-//                recyclerView.adapter = adapter
-//            },
-//            onError = { exception ->
-//                progressBar.visibility = View.GONE
-//                Toast.makeText(this, "Error: ${exception.message}", Toast.LENGTH_LONG).show()
-//            }
-//        )
-
-
         LessonRepository.getLessons(
+            context = this,
             age = age,
             subject = subject,
 //            disorderType = disorderType,
