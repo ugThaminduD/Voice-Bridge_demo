@@ -28,10 +28,19 @@ Voice-Bridge_AI_Training/
 ```
 
 **Training Command:**
+
+**macOS/Linux:**
 ```bash
 cd Voice-Bridge_AI_Training
 source venv/bin/activate
 python scripts/train_task_recommender.py --epochs 100 --batch_size 32
+```
+
+**Windows:**
+```cmd
+cd Voice-Bridge_AI_Training
+venv\Scripts\activate.bat
+python scripts\train_task_recommender.py --epochs 100 --batch_size 32
 ```
 
 **Data Preprocessing:**
@@ -111,11 +120,29 @@ cd /Users/shehansalitha/Desktop/Voice-Bridge_AI_Training
 ```
 
 **2. Create Virtual Environment:**
+
+**macOS/Linux:**
 ```bash
 python3 -m venv venv
-source venv/bin/activate  # macOS/Linux
-# venv\Scripts\activate  # Windows
+source venv/bin/activate
 ```
+
+**Windows (Command Prompt):**
+```cmd
+python -m venv venv
+venv\Scripts\activate.bat
+```
+
+**Windows (PowerShell):**
+```powershell
+python -m venv venv
+venv\Scripts\Activate.ps1
+```
+
+> **Note:** If you get an execution policy error in PowerShell, run:
+> ```powershell
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
 
 **3. Install Dependencies:**
 ```bash
@@ -133,11 +160,25 @@ ls -la models/edu_task_recommender.tflite
 
 ### Starting the Server
 
-**Command:**
+**macOS/Linux:**
 ```bash
 cd Voice-Bridge_AI_Training
 source venv/bin/activate
 python scripts/flask_api.py
+```
+
+**Windows (Command Prompt):**
+```cmd
+cd Voice-Bridge_AI_Training
+venv\Scripts\activate.bat
+python scripts\flask_api.py
+```
+
+**Windows (PowerShell):**
+```powershell
+cd Voice-Bridge_AI_Training
+venv\Scripts\Activate.ps1
+python scripts\flask_api.py
 ```
 
 **Expected Output:**
@@ -366,13 +407,25 @@ class AITherapyTasksActivity : AppCompatActivity() {
 
 **For Physical Device:**
 1. Get your computer's IP address:
-   ```bash
-   # macOS/Linux
-   ifconfig | grep "inet "
    
-   # Windows
+   **macOS/Linux:**
+   ```bash
+   ifconfig | grep "inet "
+   # Or
+   ip addr show
+   ```
+   
+   **Windows (Command Prompt):**
+   ```cmd
    ipconfig
    ```
+   
+   **Windows (PowerShell):**
+   ```powershell
+   Get-NetIPAddress -AddressFamily IPv4
+   ```
+   
+   Look for your local IP (usually starts with `192.168.x.x` or `10.x.x.x`)
 
 2. Update `BASE_URL` in `VoiceBridgeApi.kt`:
    ```kotlin
@@ -382,9 +435,22 @@ class AITherapyTasksActivity : AppCompatActivity() {
 3. Ensure device and computer are on **same WiFi network**
 
 4. Check firewall allows port 5002:
+   
+   **macOS:**
    ```bash
-   # macOS - Allow port
    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add python3
+   ```
+   
+   **Windows:**
+   ```
+   1. Open Windows Defender Firewall
+   2. Click "Advanced settings"
+   3. Click "Inbound Rules" → "New Rule"
+   4. Select "Port" → Next
+   5. Select "TCP" → Specific local ports: 5002 → Next
+   6. Select "Allow the connection" → Next
+   7. Check all profiles → Next
+   8. Name: "Flask API Port 5002" → Finish
    ```
 
 ---
@@ -485,13 +551,47 @@ curl -X POST http://localhost:5002/api/chat \
 
 ## 🐛 Troubleshooting
 
+### Quick Diagnostic Checklist (Windows)
+
+Before diving into specific issues, run through this checklist:
+
+```cmd
+REM 1. Check Flask is running
+REM Look for: "Running on http://0.0.0.0:5002"
+
+REM 2. Get your computer IP
+ipconfig
+REM Look for: IPv4 Address under Wi-Fi adapter
+
+REM 3. Test Flask from your computer
+curl -X POST http://localhost:5002/api/recommend/age -H "Content-Type: application/json" -d "{\"age\": 7, \"disorder\": \"ASD\", \"top_n\": 5}"
+
+REM 4. Check firewall allows port 5002
+netsh advfirewall firewall show rule name=all | findstr 5002
+
+REM 5. Verify both devices on same WiFi network
+REM Phone WiFi settings should show same network as computer
+```
+
+**✅ Checklist:**
+- [ ] Flask running and shows "Task Recommender Model loaded successfully"
+- [ ] You have your computer's IP address (e.g., 192.168.1.100)
+- [ ] curl test returns JSON with recommendations
+- [ ] Firewall rule exists for port 5002
+- [ ] Phone and computer on same WiFi
+- [ ] BASE_URL in VoiceBridgeApi.kt updated with your IP
+- [ ] network_security_config.xml includes your IP
+- [ ] App rebuilt after changing BASE_URL
+
+---
+
 ### Common Issues & Solutions
 
 #### 1. Flask Server Not Starting
 
 **Problem:** `Address already in use` error
 
-**Solution:**
+**Solution (macOS/Linux):**
 ```bash
 # Kill process on port 5002
 lsof -ti:5002 | xargs kill -9
@@ -500,13 +600,42 @@ lsof -ti:5002 | xargs kill -9
 python scripts/flask_api.py
 ```
 
+**Solution (Windows - Command Prompt):**
+```cmd
+REM Find process using port 5002
+netstat -ano | findstr :5002
+
+REM Kill the process (replace PID with actual Process ID)
+taskkill /PID <PID> /F
+
+REM Restart server
+python scripts\flask_api.py
+```
+
+**Solution (Windows - PowerShell):**
+```powershell
+# Find and kill process on port 5002
+Get-Process -Id (Get-NetTCPConnection -LocalPort 5002).OwningProcess | Stop-Process -Force
+
+# Restart server
+python scripts\flask_api.py
+```
+
 **Problem:** `ModuleNotFoundError: No module named 'flask'`
 
-**Solution:**
+**Solution (macOS/Linux):**
 ```bash
 # Activate virtual environment first
 cd Voice-Bridge_AI_Training
 source venv/bin/activate
+pip install flask tensorflow numpy flask-cors
+```
+
+**Solution (Windows):**
+```cmd
+REM Activate virtual environment first
+cd Voice-Bridge_AI_Training
+venv\Scripts\activate.bat
 pip install flask tensorflow numpy flask-cors
 ```
 
@@ -527,17 +656,170 @@ pip install flask tensorflow numpy flask-cors
 private const val BASE_URL = "http://192.168.1.100:5002/"
 ```
 
+**Problem:** `No recommendations showing on Android app (Windows)`
+
+**Step-by-Step Debugging for Windows:**
+
+1. **Verify Flask is Running:**
+   ```cmd
+   REM You should see these lines:
+   * Running on http://127.0.0.1:5002
+   * Running on http://YOUR_IP:5002
+   ✓ Task Recommender Model loaded successfully!
+   ✓ Chatbot loaded successfully!
+   ```
+
+2. **Get Your Computer's IP Address:**
+   ```cmd
+   ipconfig
+   ```
+   Look for **IPv4 Address** under your active network adapter (WiFi or Ethernet):
+   ```
+   Wireless LAN adapter Wi-Fi:
+      IPv4 Address. . . . . . . . . . . : 192.168.1.100
+   ```
+   **Write down this IP address!**
+
+3. **Test Flask API from Command Prompt:**
+   ```cmd
+   REM Test with localhost first
+   curl -X POST http://localhost:5002/api/recommend/age -H "Content-Type: application/json" -d "{\"age\": 7, \"disorder\": \"ASD\", \"top_n\": 5}"
+   
+   REM Test with your IP address
+   curl -X POST http://192.168.1.100:5002/api/recommend/age -H "Content-Type: application/json" -d "{\"age\": 7, \"disorder\": \"ASD\", \"top_n\": 5}"
+   ```
+   
+   **Expected Response:**
+   ```json
+   {
+     "recommendations": [
+       {
+         "task_id": 42,
+         "task_name": "Emotion Detective",
+         "confidence": 0.94,
+         ...
+       }
+     ]
+   }
+   ```
+
+4. **Configure Windows Firewall:**
+   
+   **Option A - Quick (Allow Python):**
+   ```cmd
+   REM Run as Administrator
+   netsh advfirewall firewall add rule name="Flask API" dir=in action=allow protocol=TCP localport=5002
+   ```
+   
+   **Option B - GUI Method:**
+   - Press `Win + R`, type `wf.msc`, press Enter
+   - Click "Inbound Rules" → "New Rule..."
+   - Select "Port" → Next
+   - Select "TCP", Specific local ports: `5002` → Next
+   - Select "Allow the connection" → Next
+   - Check all three boxes (Domain, Private, Public) → Next
+   - Name: "Flask API Port 5002" → Finish
+
+5. **Update Android App BASE_URL:**
+
+   Open `VoiceBridgeApi.kt` and update:
+   
+   **For Emulator:**
+   ```kotlin
+   companion object {
+       private const val BASE_URL = "http://10.0.2.2:5002/"  // ✅ Use this for emulator
+   ```
+   
+   **For Physical Device:**
+   ```kotlin
+   companion object {
+       private const val BASE_URL = "http://192.168.1.100:5002/"  // ✅ Replace with YOUR IP
+   ```
+
+6. **Verify Network Security Config:**
+   
+   Check `app/src/main/res/xml/network_security_config.xml`:
+   ```xml
+   <?xml version="1.0" encoding="utf-8"?>
+   <network-security-config>
+       <domain-config cleartextTrafficPermitted="true">
+           <domain includeSubdomains="true">10.0.2.2</domain>
+           <domain includeSubdomains="true">192.168.1.100</domain>  <!-- Add your IP -->
+           <domain includeSubdomains="true">localhost</domain>
+       </domain-config>
+   </network-security-config>
+   ```
+
+7. **Rebuild Android App:**
+   ```cmd
+   cd Voice-Bridge_demo
+   gradlew.bat clean assembleDebug
+   ```
+
+8. **Check Android Logcat:**
+   
+   In Android Studio, open Logcat and filter by "AIRepository" or "Retrofit":
+   ```
+   ✅ Good: POST http://192.168.1.100:5002/api/recommend/age --> 200 OK
+   ❌ Bad: Failed to connect to /192.168.1.100:5002
+   ❌ Bad: Connection refused
+   ❌ Bad: Connection timed out
+   ```
+
+9. **Check Flask Terminal Logs:**
+   
+   When you click "AI Recommendations" in the app, you should see in Flask terminal:
+   ```
+   127.0.0.1 - - [08/Feb/2026 10:30:45] "POST /api/recommend/age HTTP/1.1" 200 -
+   ```
+   
+   If you see nothing → Flask not receiving request (firewall/IP issue)
+   
+   If you see 500 error → Model error (check Flask terminal for Python errors)
+
+10. **Common Windows Issues:**
+
+    **Issue:** Firewall blocking connections
+    ```cmd
+    REM Temporarily disable firewall to test (NOT recommended for production)
+    netsh advfirewall set allprofiles state off
+    
+    REM Re-enable after testing
+    netsh advfirewall set allprofiles state on
+    ```
+    
+    **Issue:** Wrong IP address
+    - Make sure both devices on same WiFi
+    - Use WiFi adapter IP, not Ethernet if phone uses WiFi
+    - IP should start with 192.168.x.x or 10.x.x.x
+    
+    **Issue:** Flask binding to 127.0.0.1 only
+    
+    Check `flask_api.py` has:
+    ```python
+    app.run(host='0.0.0.0', port=5002, debug=True)  # ✅ Must be 0.0.0.0, not 127.0.0.1
+    ```
+
 #### 3. Model Loading Errors
 
 **Problem:** `Model file not found`
 
-**Solution:**
+**Solution (macOS/Linux):**
 ```bash
 # Verify model exists
 ls -la Voice-Bridge_AI_Training/models/edu_task_recommender.tflite
 
 # Check file permissions
 chmod 644 Voice-Bridge_AI_Training/models/*.tflite
+```
+
+**Solution (Windows):**
+```cmd
+REM Verify model exists
+dir Voice-Bridge_AI_Training\models\edu_task_recommender.tflite
+
+REM Check if file is accessible
+type Voice-Bridge_AI_Training\models\edu_task_recommender.tflite > nul
 ```
 
 **Problem:** `Invalid TFLite model`
@@ -613,10 +895,26 @@ implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
 ### Complete Setup Steps
 
 **1. Start Flask Server:**
+
+**macOS/Linux:**
 ```bash
 cd Voice-Bridge_AI_Training
 source venv/bin/activate
 python scripts/flask_api.py
+```
+
+**Windows (Command Prompt):**
+```cmd
+cd Voice-Bridge_AI_Training
+venv\Scripts\activate.bat
+python scripts\flask_api.py
+```
+
+**Windows (PowerShell):**
+```powershell
+cd Voice-Bridge_AI_Training
+venv\Scripts\Activate.ps1
+python scripts\flask_api.py
 ```
 
 **2. Test API Endpoints:**
@@ -633,9 +931,17 @@ curl -X POST http://localhost:5002/api/chat \
 ```
 
 **3. Build Android App:**
+
+**macOS/Linux:**
 ```bash
 cd Voice-Bridge_demo
 ./gradlew assembleDebug
+```
+
+**Windows:**
+```cmd
+cd Voice-Bridge_demo
+gradlew.bat assembleDebug
 ```
 
 **4. Run on Device:**
